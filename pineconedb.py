@@ -20,3 +20,10 @@ embed_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 vectorstore = Pinecone(index, embed_model, "text")
 
 print("Pinccone setup completed")
+
+def search(query):
+    query_vector = embed_model.encode(query)
+    
+    results = index.query(query_vector, top_k=5)
+    
+    return [result.id for result in results]
