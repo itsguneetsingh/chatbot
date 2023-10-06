@@ -1,36 +1,36 @@
-import pinecone
+from unstructured.partition.auto import partition
+from unstructured.chunking.title import chunk_by_title
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.document_loaders import DirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Pinecone
+import pinecone
 import constants
 
+"""
+We're basically going convert the pdf to a text and then convert it to smaller chunks (a question - answer pair as a query)
+and in the end, we're going to put these chunks into a json file.
 
-def load_docs(directory):
-  loader = DirectoryLoader(directory)
-  documents = loader.load()
-  return documents
-
-def split_docs(documents,chunk_size=500,chunk_overlap=20):
-  text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-  docs = text_splitter.split_documents(documents)
-  return docs
+- In order to do this, we're going to follow the below mentioned steps:
+- Take the input of the pdf file and extract all the text from it
+- Split the text into smaller chunks of queries as mentioned above
+- Embed those queries into a vector space
+"""
 
 
-directory = 'data/'
+input_filename = r"C:\Users\itsgu\Downloads\apple.pdf"
 
-print("Loading documents...")
+elements = partition(filename=input_filename, strategy="auto")
+chunks = chunk_by_title(elements, multipage_sections=True)
+text = ""
 
-documents = load_docs(directory)
-docs = split_docs(documents)
+for chunk in chunks:
+    text += str(chunk)
 
-print("Embedding...")
+result = text.split("---")
+
+print("setting up embedding query...")
 embed_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 query_result = embed_model.embed_query("Problem With iPhone")
 print(len(query_result))
-
-
-# using pinecone for Vector DB Indexing
 
 print("Pinecone setup")
 pinecone.init(
@@ -40,11 +40,11 @@ pinecone.init(
 
 print("Creating index")
 # to create a new index
-index = Pinecone.from_documents(docs, embed_model, index_name=constants.PINECONE_INDEX_NAME)
+index = pinecone.Index(constants.PINECONE_INDEX_NAME)
+vectorstore = Pinecone(index, embed_model.embed_query, "Problem With iPhone")
 
-# in order to add more text this should be used
+vectorstore.add_texts(result)
 
-# index = pinecone.Index(constants.PINECONE_INDEX_NAME)
-# vectorstore = Pinecone(index, embed_model.embed_query, "text")
 
-# vectorstore.add_texts(Docs)
+
+
