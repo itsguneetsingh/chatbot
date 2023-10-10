@@ -41,7 +41,7 @@ pinecone.init(
 print("Creating index")
 # to create a new index
 index = pinecone.Index(constants.PINECONE_INDEX_NAME)
-vectorstore = Pinecone(index, embed_model.embed_query, "Problem With iPhone")
+vectorstore = Pinecone(index, embed_model.embed_query, "text")
 
 vectorstore.add_texts(result)
 

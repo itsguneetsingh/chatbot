@@ -3,8 +3,4 @@ sentence_transformers
 openai
 pinecone-client
 unstructured[all-docs]
-libmagic-dev
-poppler-utils
-tesseract-ocr
-libreoffice
-pandoc
+elevenlabs

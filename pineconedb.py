@@ -24,6 +24,6 @@ print("Pinccone setup completed")
 def search(query):
     query_vector = embed_model.encode(query)
     
-    results = index.query(query_vector, top_k=5)
+    results = index.query(query_vector, top_k=2)
     
     return [result.id for result in results]

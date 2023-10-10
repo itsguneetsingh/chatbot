@@ -6,10 +6,10 @@ from langchain.agents.agent_toolkits import create_conversational_retrieval_agen
 from langchain.agents.agent_toolkits import create_retriever_tool
 from langchain.chains import RetrievalQA
 import constants
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
+from TTS import TTSCallbackHandler
 
 
-llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.0, streaming=True, callbacks=[StreamingStdOutCallbackHandler()])
+llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.0, streaming=True, callbacks=[TTSCallbackHandler()])
 print('llm ready')
 
 # question-answer retrival chain
@@ -21,7 +21,7 @@ search = RetrievalQA.from_chain_type(
 
 tools = [Tool(name = "VectorStore_Search", description = "Search from documents using Pinecone", func = search)]
 
-agent = create_conversational_retrieval_agent(llm, tools, verbose=True, early_stopping_method = "generate")
+agent = create_conversational_retrieval_agent(llm, tools, verbose=False, early_stopping_method = "generate")
 print('tools ready')
 
 print("Running agent now...")
