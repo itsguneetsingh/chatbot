@@ -4,3 +4,11 @@ openai
 pinecone-client
 unstructured[all-docs]
 elevenlabs
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+google-cloud-speech
+pyaudio
+
+# Also install google cloud sdk

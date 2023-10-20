@@ -23,7 +23,7 @@ class TTSCallbackHandler(BaseCallbackHandler):
             self.content = ""
         else :
             self.content += token
-            tts(token)
+            # tts(token)
 
 
     # def on_llm_new_token(self, token: str, **kwargs: any) -> None:

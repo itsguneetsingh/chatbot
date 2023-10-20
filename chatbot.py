@@ -6,7 +6,7 @@ from langchain.agents.agent_toolkits import create_conversational_retrieval_agen
 from langchain.agents.agent_toolkits import create_retriever_tool
 from langchain.chains import RetrievalQA
 import constants
-from TTS import TTSCallbackHandler
+from TextToSpeech import TTSCallbackHandler
 
 
 llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.0, streaming=True, callbacks=[TTSCallbackHandler()])
