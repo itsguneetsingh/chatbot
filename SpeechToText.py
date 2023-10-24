@@ -1,4 +1,3 @@
-
 import queue
 import re
 import sys
@@ -198,7 +197,9 @@ def main() -> None:
     print("config set")
 
     streaming_config = speech.StreamingRecognitionConfig(
-        config=config, interim_results=True
+        config=config,
+        interim_results=True,
+        #single_utterance=True
     )
 
     print('streaming config set')
@@ -213,7 +214,7 @@ def main() -> None:
         print('start speaking')
 
         responses = client.streaming_recognize(streaming_config, requests)
-        transcript = None
+        # transcript = None
 
         for response in responses:
             transcript = listen_print_loop([response])

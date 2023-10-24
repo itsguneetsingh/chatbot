@@ -10,5 +10,13 @@ google-auth-httplib2
 google-api-python-client
 google-cloud-speech
 pyaudio
+twilio
+ngrok
 
-# Also install google cloud sdk
+
+'''
+Other packages to be installed:
+1. google cloud sdk
+2. twilio-CLI
+3. ngrok
+'''

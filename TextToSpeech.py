@@ -6,26 +6,25 @@ from langchain.callbacks.base import BaseCallbackHandler
 
 set_api_key(constants.ELEVENLABS_API_KEY)
 
-def tts(text):
-    play(generate(text=text, voice="Callum"))
-
-
-
 class TTSCallbackHandler(BaseCallbackHandler):
     def __init__(self) -> None:
         self.content: str = ""
         self.final_answer: bool = False
 
+    def tts(text):
+        play(generate(text=text, voice="Callum"))
+
     def on_llm_new_token(self, token: str, **kwargs) -> None:
-        if(token == "." or token == "?" or token == "!" or token == ":"):
+        if(token == "?" or token == "!" or token == ":"):
             self.content += token
-            print(f"Line = {self.content}")
+            print(self.content)
             self.content = ""
         else :
             self.content += token
             # tts(token)
 
 
+# Might come in handy but forgot what to use this for
     # def on_llm_new_token(self, token: str, **kwargs: any) -> None:
     #     self.content += token
     #     if "Final Answer" in self.content:

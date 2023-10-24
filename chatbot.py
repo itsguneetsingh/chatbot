@@ -9,32 +9,34 @@ import constants
 from TextToSpeech import TTSCallbackHandler
 
 
-llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.0, streaming=True, callbacks=[TTSCallbackHandler()])
-print('llm ready')
+def load_agent():
+  llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.0, streaming=True, callbacks=[TTSCallbackHandler()])
+  print('llm ready')
 
-# question-answer retrival chain
-retriever = vectorstore.as_retriever()
-search = RetrievalQA.from_chain_type(
-    llm=llm, chain_type="stuff", retriever=retriever
-)
+  # question-answer retrival chain
+  retriever = vectorstore.as_retriever()
+  search = RetrievalQA.from_chain_type(
+      llm=llm, chain_type="stuff", retriever=retriever
+  )
+
+  tools = [Tool(name = "VectorStore_Search", description = "Search from documents using Pinecone", func = search)]
+
+  agent = create_conversational_retrieval_agent(llm, tools, verbose=False, early_stopping_method = "generate")
+  print('tools ready')
 
 
-tools = [Tool(name = "VectorStore_Search", description = "Search from documents using Pinecone", func = search)]
+  print("Running agent now...")
+  return agent
 
-agent = create_conversational_retrieval_agent(llm, tools, verbose=False, early_stopping_method = "generate")
-print('tools ready')
+  # query = None
 
-print("Running agent now...")
+  # while True:
+  #   if not query:
+  #     query = input("Prompt: ")
+  #   if query in ['quit', 'q', 'exit']:
+  #     sys.exit()
+    
+  #   result = agent(query)
+  #   print(result['output'])
 
-query = None
-
-while True:
-  if not query:
-    query = input("Prompt: ")
-  if query in ['quit', 'q', 'exit']:
-    sys.exit()
-  
-  result = agent(query)
-  print(result['output'])
-
-  query = None
+  #   query = None
