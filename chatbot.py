@@ -10,7 +10,7 @@ from TextToSpeech import TTSCallbackHandler
 
 
 def load_agent():
-  llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.0, streaming=True, callbacks=[TTSCallbackHandler()])
+  llm = ChatOpenAI(model_name="gpt-3.5-turbo", openai_api_key=constants.OPENAI_API_KEY, temperature=0.2, streaming=True , callbacks=[TTSCallbackHandler()])
   print('llm ready')
 
   # question-answer retrival chain
@@ -28,15 +28,19 @@ def load_agent():
   print("Running agent now...")
   return agent
 
-  # query = None
+#   query = None
 
-  # while True:
-  #   if not query:
-  #     query = input("Prompt: ")
-  #   if query in ['quit', 'q', 'exit']:
-  #     sys.exit()
+#   while True:
+#     if not query:
+#       query = input("Prompt: ")
+#     if query in ['quit', 'q', 'exit']:
+#       sys.exit()
     
-  #   result = agent(query)
-  #   print(result['output'])
+#     result = agent(query)
+#     print(result['output'])
 
-  #   query = None
+#     query = None
+
+
+# if __name__ == "__main__":
+#   load_agent()

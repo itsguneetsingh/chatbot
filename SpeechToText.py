@@ -1,15 +1,18 @@
 import queue
 import re
 import sys
+import time
 
 from google.cloud import speech
 from google.oauth2 import service_account
+import chatbot
 
 import pyaudio
 
 # Audio recording parameters
-RATE = 8000
+RATE = 16000
 CHUNK = int(RATE / 10)  # 100ms
+agent = chatbot.load_agent()
 
 
 class MicrophoneStream:
@@ -133,6 +136,7 @@ def listen_print_loop(responses: object) -> str:
         The transcribed text.
     """
     num_chars_printed = 0
+    start_time = None
     for response in responses:
         if not response.results:
             continue
@@ -154,12 +158,19 @@ def listen_print_loop(responses: object) -> str:
         # some extra spaces to overwrite the previous result
         overwrite_chars = " " * (num_chars_printed - len(transcript))
 
+        if start_time and time.time() - start_time > 0.1:
+            agent(transcript + overwrite_chars)
+            start_time = None
+
         if not result.is_final:
             sys.stdout.write(transcript + overwrite_chars + "\r")
             sys.stdout.flush()
 
             num_chars_printed = len(transcript)
 
+            start_time = None
+
+        # final result
         else:
             print(transcript + overwrite_chars)
 
@@ -168,9 +179,9 @@ def listen_print_loop(responses: object) -> str:
             if re.search(r"\b(exit|quit)\b", transcript, re.I):
                 print("Exiting..")
                 sys.exit()
-                break
 
             num_chars_printed = 0
+            start_time = time.time()
 
         return transcript
 
@@ -187,7 +198,7 @@ def main() -> None:
 
     language_code = "en-IN"  # a BCP-47 language tag
 
-    client = speech.SpeechClient()
+    
     config = speech.RecognitionConfig(
         encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
         sample_rate_hertz=RATE,
@@ -198,27 +209,36 @@ def main() -> None:
 
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
-        interim_results=True,
-        #single_utterance=True
+        interim_results = True,
+        # single_utterance=True
     )
 
     print('streaming config set')
 
-    with MicrophoneStream(RATE, CHUNK) as stream:
-        audio_generator = stream.generator()
-        requests = (
-            speech.StreamingRecognizeRequest(audio_content=content)
-            for content in audio_generator
-        )
+    while True:
 
-        print('start speaking')
+        client = speech.SpeechClient()
 
-        responses = client.streaming_recognize(streaming_config, requests)
-        # transcript = None
+        with MicrophoneStream(RATE, CHUNK) as stream:
+            audio_generator = stream.generator()
+            requests = (
+                speech.StreamingRecognizeRequest(audio_content=content)
+                for content in audio_generator
+            )
 
-        for response in responses:
-            transcript = listen_print_loop([response])
+            print('start speaking')
+
+            responses = client.streaming_recognize(streaming_config, requests)
+            # transcript = None
+
+            for response in responses:
+                transcript = listen_print_loop([response])
+                continue
             # full_transcript += transcript  # Append the current transcript
+
+
+        # for result in responses.results:
+        #     print("Transcript: {}".format(result.alternatives[0].transcript))
 
         # You can process the full transcription here as needed
         # print("Full Transcript:", full_transcript)

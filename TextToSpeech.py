@@ -1,27 +1,33 @@
 # using ElevenLabs for TTS
-import sys
+
 import constants
 from  elevenlabs import set_api_key, generate, play
+# from langchain import *
 from langchain.callbacks.base import BaseCallbackHandler
 
 set_api_key(constants.ELEVENLABS_API_KEY)
 
+def tts(text):
+    audio_bytes = b"".join(list(generate(
+        text=text,
+        voice="Callum",
+        model="eleven_multilingual_v1",
+        stream=True)))
+    
+    play(audio_bytes)
+
 class TTSCallbackHandler(BaseCallbackHandler):
     def __init__(self) -> None:
         self.content: str = ""
-        self.final_answer: bool = False
-
-    def tts(text):
-        play(generate(text=text, voice="Callum"))
 
     def on_llm_new_token(self, token: str, **kwargs) -> None:
-        if(token == "?" or token == "!" or token == ":"):
-            self.content += token
-            print(self.content)
-            self.content = ""
-        else :
-            self.content += token
-            # tts(token)
+        self.content += token
+            
+    def on_llm_end(self, response: dict, **kwargs : any) -> any:
+        print(self.content)
+        tts(self.content)
+        self.content = ""
+        # return super().on_llm_end(self.content, **kwargs)
 
 
 # Might come in handy but forgot what to use this for

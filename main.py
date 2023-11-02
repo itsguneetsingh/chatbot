@@ -1,7 +1,7 @@
 import SpeechToText
 import pinecone
 import constants
-import chatbot
+# import chatbot
 
 
 from google.cloud import speech
@@ -28,7 +28,9 @@ def main() -> None:
     print("config set")
 
     streaming_config = speech.StreamingRecognitionConfig(
-        config=config, interim_results = False, #single_utterance=True
+        config=config,
+        interim_results = True,
+        single_utterance=True
     )
 
     print('streaming config set')
@@ -37,27 +39,30 @@ def main() -> None:
 
     print('pinecone initialized')
 
-    agent = chatbot.load_agent()
+    # agent = chatbot.load_agent()
 
     print('done loading agent')
 
+
+
     with SpeechToText.MicrophoneStream(SpeechToText.RATE, SpeechToText.CHUNK) as stream:
-        audio_generator = stream.generator()
-        requests = (
-            speech.StreamingRecognizeRequest(audio_content=content)
-            for content in audio_generator
-        )
+        while True:  # Infinite loop
+            audio_generator = stream.generator()
+            requests = (
+                speech.StreamingRecognizeRequest(audio_content=content)
+                for content in audio_generator
+            )
 
-        print('start speaking')
+            print('start speaking')
 
-        responses = client.streaming_recognize(streaming_config, requests)
-        transcript = None
+            responses = client.streaming_recognize(streaming_config, requests)
+            transcript = None
 
-        for response in responses:
-            # full_transcript = ""
-            transcript = SpeechToText.listen_print_loop([response])
-            # full_transcript += transcript  # Append the current transcript
-            agent(transcript)
+            for response in responses:
+                transcript = SpeechToText.listen_print_loop([response])
+                continue
+                # agent(transcript)
+
 
 
 if __name__ == "__main__":

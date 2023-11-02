@@ -1,7 +1,9 @@
 from twilio.rest import Client
+from twilio.twiml.voice_response import VoiceResponse
 from google.cloud import speech
 from google.cloud.speech import enums
 from google.cloud.speech import types
+import elevenlabs
 
 '''
 Everything written here is assuming that you have:
@@ -57,3 +59,10 @@ If you need to send elevenlabs audio to twilio, you need to do the following thi
     Write it into a folder as an audio file
     Then, play the thing into the twilio call
 '''
+
+audio = elevenlabs.generate(text = "", voice = "Callum", model = "eleven_multilingual_v2", stream = True)
+
+response = VoiceResponse()
+
+response.play(audio)
+response.record(timeout=3, action='/recording', finish_on_key='1', play_beep=True)
