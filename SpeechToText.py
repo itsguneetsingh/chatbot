@@ -1,13 +1,12 @@
 import queue
 import re
 import sys
-import time
 
 from google.cloud import speech
 from google.oauth2 import service_account
-import chatbot
 
 import pyaudio
+import chatbot
 
 # Audio recording parameters
 RATE = 16000
@@ -136,7 +135,6 @@ def listen_print_loop(responses: object) -> str:
         The transcribed text.
     """
     num_chars_printed = 0
-    start_time = None
     for response in responses:
         if not response.results:
             continue
@@ -158,19 +156,12 @@ def listen_print_loop(responses: object) -> str:
         # some extra spaces to overwrite the previous result
         overwrite_chars = " " * (num_chars_printed - len(transcript))
 
-        if start_time and time.time() - start_time > 0.1:
-            agent(transcript + overwrite_chars)
-            start_time = None
-
         if not result.is_final:
             sys.stdout.write(transcript + overwrite_chars + "\r")
             sys.stdout.flush()
 
             num_chars_printed = len(transcript)
 
-            start_time = None
-
-        # final result
         else:
             print(transcript + overwrite_chars)
 
@@ -180,8 +171,10 @@ def listen_print_loop(responses: object) -> str:
                 print("Exiting..")
                 sys.exit()
 
+            else:
+                agent(transcript)
+
             num_chars_printed = 0
-            start_time = time.time()
 
         return transcript
 
@@ -210,7 +203,9 @@ def main() -> None:
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
         interim_results = True,
-        # single_utterance=True
+        # single_utterance=True,
+        # streaming_features = True,
+        # enable_voice_activity_events = True,
     )
 
     print('streaming config set')

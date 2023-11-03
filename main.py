@@ -29,8 +29,9 @@ def main() -> None:
 
     streaming_config = speech.StreamingRecognitionConfig(
         config=config,
-        interim_results = True,
-        single_utterance=True
+        # interim_results = True,
+        # single_utterance=True
+        # streaming_features = True
     )
 
     print('streaming config set')
