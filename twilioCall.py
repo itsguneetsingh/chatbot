@@ -1,8 +1,6 @@
 from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse
 from google.cloud import speech
-from google.cloud.speech import enums
-from google.cloud.speech import types
 import elevenlabs
 
 '''
@@ -12,8 +10,8 @@ Everything written here is assuming that you have:
 '''
 
 #Configuring Twilio
-twilio_account_sid = "TWILIO_ACCOUNT_SID"
-twilio_auth_token = "TWILIO_AUTH_TOKEN"
+twilio_account_sid = "ACdb15b764e85f2be2421a039eda94021e"
+twilio_auth_token = "772d21fd82a885a1a3a323d00bfbebb3"
 client = Client(twilio_account_sid, twilio_auth_token)
 
 # Configuring Google Cloud
@@ -29,11 +27,11 @@ If you need to listen to what the custoer says on the phone call using twilio, d
 def process_audio(message):
     audio = message.media_stream.content
     if audio:
-        audio_config = types.RecoginitionConfig(
-            encoding = enums.regognitionConfig.AudioEncoding.LINEAR16,
+        audio_config = speech.RecoginitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
             sample_rate_hertz = 16000,
         )
-        audio_data = types.RecognitionAudio(content=audio)
+        audio_data = speech.RecognitionAudio(content=audio)
 
         response = google_cloud_speech_client.recognize(config=audio_config, audio=audio_data)
 
@@ -44,9 +42,9 @@ def process_audio(message):
 #Settin up a call with Media Streams using twilio
 call = client.calls.create(
     url="http://twimlets.com/holdmusic?Bucket=com.twilio.music.ambient",
-    to="TO_PHONE_NUMBER",
-    from_="FROM_PHONE_NUMBER",
-    meadia_stream_callback = process_audio,
+    to="+917082439684",
+    from_="+13193135561",
+    media_stream_callback = process_audio,
 )
 
 # Just printing unique call id for the record
@@ -60,9 +58,9 @@ If you need to send elevenlabs audio to twilio, you need to do the following thi
     Then, play the thing into the twilio call
 '''
 
-audio = elevenlabs.generate(text = "", voice = "Callum", model = "eleven_multilingual_v2", stream = True)
+# audio = elevenlabs.generate(text = "", voice = "Callum", model = "eleven_multilingual_v2", stream = True)
 
-response = VoiceResponse()
+# response = VoiceResponse()
 
-response.play(audio)
-response.record(timeout=3, action='/recording', finish_on_key='1', play_beep=True)
+# response.play(audio)
+# response.record(timeout=3, action='/recording', finish_on_key='1', play_beep=True)
